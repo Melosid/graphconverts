@@ -324,15 +324,14 @@ const App = () => {
             }
           />
         </div>
-        {/* <div>
-          <h5>
-            Add your (.arff) file to the (.gr) file above and download output
-            file
-          </h5>{" "}
-          <input type="file" onChange={handleArffFileUpload} />
-          <button onClick={handleOutFileDownload}>Download Output File</button>
-          {arffFile ? <h4>File chosen: {arffFile.name}</h4> : ""}
-        </div> */}
+        <div
+          style={{
+            marginTop: "20px",
+            width: "95%",
+            height: "2px",
+            backgroundColor: "black",
+          }}
+        ></div>
         <div>
           <h5>Choose your input file (.arff) and download out file</h5>
           <input
