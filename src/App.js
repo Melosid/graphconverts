@@ -241,6 +241,7 @@ const App = () => {
           backgroundColor: "#fafafa",
         }}
       >
+        {/* div of gr input starts */}
         <div>
           <h5>Choose your input file (.gr) and download csv file</h5>
           <input
@@ -323,7 +324,7 @@ const App = () => {
             }
           />
         </div>
-        <div>
+        {/* <div>
           <h5>
             Add your (.arff) file to the (.gr) file above and download output
             file
@@ -331,6 +332,87 @@ const App = () => {
           <input type="file" onChange={handleArffFileUpload} />
           <button onClick={handleOutFileDownload}>Download Output File</button>
           {arffFile ? <h4>File chosen: {arffFile.name}</h4> : ""}
+        </div> */}
+        <div>
+          <h5>Choose your input file (.arff) and download out file</h5>
+          <input
+            id="arffUpload"
+            type="file"
+            onChange={handleArffFileUpload}
+            style={{ display: "none" }}
+          />
+        </div>
+        <div style={{ display: "flex" }}>
+          <div>{arffFile ? arffFile.name : "Upload file"}</div>
+          <div style={{ marginLeft: "50px" }}>
+            {arffFile ? "Download Out" : ""}
+          </div>
+        </div>
+        <div
+          style={{
+            display: "inline-block",
+          }}
+        >
+          {arffFile === undefined ? (
+            <FontAwesomeIcon
+              id="uploadIcon2"
+              icon={faFileUpload}
+              size="7x"
+              style={{ marginTop: "10px" }}
+              onClick={() => {
+                document.getElementById("arffUpload").click();
+              }}
+              onMouseOver={() =>
+                (document.getElementById("uploadIcon2").style.color = "grey")
+              }
+              onMouseOut={() =>
+                (document.getElementById("uploadIcon2").style.color = "black")
+              }
+            />
+          ) : (
+            <FontAwesomeIcon
+              id="fileIcon2"
+              icon={faFileAlt}
+              size="7x"
+              style={{ marginTop: "10px", color: "black" }}
+            />
+          )}
+          <FontAwesomeIcon
+            id="downloadIcon2"
+            icon={faFileDownload}
+            size="7x"
+            style={{ marginTop: "10px", marginLeft: "50px" }}
+            onClick={handleOutFileDownload}
+            onMouseOver={() =>
+              (document.getElementById("downloadIcon2").style.color = "grey")
+            }
+            onMouseOut={() =>
+              (document.getElementById("downloadIcon2").style.color = "black")
+            }
+          />
+          <FontAwesomeIcon
+            id="clearIcon2"
+            icon={faTimesCircle}
+            size="2x"
+            style={{
+              marginTop: "10px",
+              marginLeft: "50px",
+              marginBottom: "70px",
+              color: "black",
+            }}
+            onClick={() => {
+              setArffFile(undefined);
+              setTextofArffFile(undefined);
+              setOutputFile(undefined);
+              document.getElementById("arffUpload").value = null;
+            }}
+            onMouseOver={() =>
+              (document.getElementById("clearIcon2").style.color = "grey")
+            }
+            onMouseOut={() =>
+              (document.getElementById("clearIcon2").style.color = "black")
+            }
+          />
         </div>
       </div>
       <div style={{ width: "100%", height: "100vh" }}>
