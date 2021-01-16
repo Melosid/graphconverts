@@ -1,25 +1,219 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState, useRef } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faFileAlt,
+  faFileDownload,
+  faFileUpload,
+  faTimesCircle,
+} from "@fortawesome/free-solid-svg-icons";
 
-function App() {
+const App = () => {
+  const [inputFile, setInputFile] = useState();
+  const [textOfInputFile, setTextOfInputFile] = useState();
+  const [dataObject, setDataObject] = useState();
+  const [csvFile, setCsvFile] = useState();
+
+  const [arffFile, setArffFile] = useState();
+  const [textOfArffFile, setTextofArffFile] = useState();
+
+  const reader = new FileReader();
+
+  //
+  //Extract text from .gr file and save it when .gr becomes available
+  useEffect(() => {
+    if (inputFile !== undefined) {
+      console.log(inputFile);
+      reader.readAsText(inputFile, "utf-8");
+      reader.onload = (event) => {
+        setTextOfInputFile(event.target.result);
+      };
+    }
+  }, [inputFile]);
+
+  //Convert input file .gr to csv file
+  useEffect(() => {
+    if (textOfInputFile !== undefined) {
+      var textByLine = textOfInputFile.split("\n");
+      textByLine = textByLine.filter((line) => line !== "");
+      console.log(textByLine);
+
+      var dataObj = {
+        nodesD: 0,
+        linksD: 0,
+        linkedNodes: [],
+      };
+      var csv = "Nodes";
+
+      textByLine.forEach((row) => {
+        var arrayOfLine = row.split(" ");
+        if (arrayOfLine[0] === "p") {
+          dataObj.nodes = arrayOfLine[2];
+          dataObj.links = arrayOfLine[3];
+        } else {
+          if (!dataObj.linkedNodes.includes(arrayOfLine[0])) {
+            dataObj.linkedNodes.push(arrayOfLine[0]);
+          }
+          if (!dataObj.linkedNodes.includes(arrayOfLine[1])) {
+            dataObj.linkedNodes.push(arrayOfLine[1]);
+          }
+        }
+      });
+
+      dataObj.linkedNodes = dataObj.linkedNodes.sort((a, b) => a - b);
+      console.log(dataObj.linkedNodes);
+      setDataObject(dataObj);
+
+      dataObj.linkedNodes.forEach((node) => {
+        csv = csv + `\n ${node}`;
+      });
+      console.log(csv);
+      setCsvFile(csv);
+    }
+  }, [textOfInputFile]);
+
+  //
+  //upload gr input file
+  const handleFileUpload = (event) => {
+    setInputFile(event.target.files[0]);
+  };
+
+  //
+  //download csv file
+  const handleDownload = () => {
+    var element = document.createElement("a");
+    element.setAttribute(
+      "href",
+      "data:text/plain;charset=utf-8," + encodeURIComponent(csvFile)
+    );
+    var newName =
+      inputFile.name.substr(0, inputFile.name.length - 3) + "Converted.csv";
+    element.setAttribute("download", newName);
+
+    element.style.display = "none";
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+  };
+
+  //
+  //
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <div style={{ display: "flex" }}>
+      <div
+        style={{
+          display: "inline-block",
+          paddingLeft: "10px",
+          width: "400px",
+          height: "100vh",
+          backgroundColor: "#fafafa",
+        }}
+      >
+        <div>
+          <h5>Choose your input file (.gr) and download csv file</h5>
+          <input
+            id="grUpload"
+            type="file"
+            onChange={handleFileUpload}
+            style={{ display: "none" }}
+          />
+        </div>
+        <div style={{ display: "flex" }}>
+          <div>{inputFile ? inputFile.name : "Upload file"}</div>
+          <div style={{ marginLeft: "50px" }}>
+            {inputFile ? "Download CSV" : ""}
+          </div>
+        </div>
+        <div
+          style={{
+            display: "inline-block",
+          }}
         >
-          Learn React
-        </a>
-      </header>
+          {inputFile === undefined ? (
+            <FontAwesomeIcon
+              id="uploadIcon"
+              icon={faFileUpload}
+              size="7x"
+              style={{ marginTop: "10px" }}
+              onClick={() => {
+                document.getElementById("grUpload").click();
+              }}
+              onMouseOver={() =>
+                (document.getElementById("uploadIcon").style.color = "grey")
+              }
+              onMouseOut={() =>
+                (document.getElementById("uploadIcon").style.color = "black")
+              }
+            />
+          ) : (
+            <FontAwesomeIcon
+              id="fileIcon"
+              icon={faFileAlt}
+              size="7x"
+              style={{ marginTop: "10px", color: "black" }}
+            />
+          )}
+          <FontAwesomeIcon
+            id="downloadIcon"
+            icon={faFileDownload}
+            size="7x"
+            style={{ marginTop: "10px", marginLeft: "50px" }}
+            onClick={handleDownload}
+            onMouseOver={() =>
+              (document.getElementById("downloadIcon").style.color = "grey")
+            }
+            onMouseOut={() =>
+              (document.getElementById("downloadIcon").style.color = "black")
+            }
+          />
+          <FontAwesomeIcon
+            id="clearIcon"
+            icon={faTimesCircle}
+            size="2x"
+            style={{
+              marginTop: "10px",
+              marginLeft: "50px",
+              marginBottom: "70px",
+              color: "black",
+            }}
+            onClick={() => {
+              setInputFile(undefined);
+              setTextOfInputFile(undefined);
+              setCsvFile(undefined);
+              setDataObject(undefined);
+              document.getElementById("grUpload").value = null;
+            }}
+            onMouseOver={() =>
+              (document.getElementById("clearIcon").style.color = "grey")
+            }
+            onMouseOut={() =>
+              (document.getElementById("clearIcon").style.color = "black")
+            }
+          />
+        </div>
+        <div>
+          <h5>
+            Add your (.arff) file to the (.gr) file above and download output
+            file
+          </h5>{" "}
+          <input
+            type="file"
+            // onChange={handleArffFileUpload}
+          />
+          <button
+          // onClick={handleOutFileDownload}
+          >
+            Download Output File
+          </button>
+          {arffFile ? <h4>File chosen: {arffFile.name}</h4> : ""}
+        </div>
+      </div>
+      <div style={{ width: "100%", height: "100vh" }}>
+        {/* <svg ref={svgEl} style={{ width: "100%", height: "100%" }}></svg> */}
+      </div>
     </div>
   );
-}
+};
 
 export default App;
