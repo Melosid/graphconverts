@@ -18,6 +18,9 @@ const App = () => {
 
   const reader = new FileReader();
 
+  const [initialLinks, setInitialLinks] = useState();
+  const [finalLinks, setFinalLinks] = useState();
+
   //
   //Extract text from .gr file and save it when .gr becomes available
   useEffect(() => {
@@ -30,6 +33,7 @@ const App = () => {
     }
   }, [inputFile]);
 
+  //
   //Convert input file .gr to csv file
   useEffect(() => {
     if (textOfInputFile !== undefined) {
@@ -43,6 +47,7 @@ const App = () => {
         linkedNodes: [],
       };
       var csv = "Nodes";
+      var initLinks = [];
 
       textByLine.forEach((row) => {
         var arrayOfLine = row.split(" ");
@@ -56,12 +61,20 @@ const App = () => {
           if (!dataObj.linkedNodes.includes(arrayOfLine[1])) {
             dataObj.linkedNodes.push(arrayOfLine[1]);
           }
+
+          //add to initialLinks
+          initLinks.push({
+            x: arrayOfLine[0],
+            y: arrayOfLine[1],
+          });
         }
       });
 
       dataObj.linkedNodes = dataObj.linkedNodes.sort((a, b) => a - b);
       console.log(dataObj.linkedNodes);
       setDataObject(dataObj);
+      console.log(initLinks);
+      setInitialLinks(initLinks);
 
       dataObj.linkedNodes.forEach((node) => {
         csv = csv + `\n ${node}`;
@@ -70,6 +83,58 @@ const App = () => {
       setCsvFile(csv);
     }
   }, [textOfInputFile]);
+
+  //
+  //Extract text from .arff file and save it when .arff file becomes available
+  useEffect(() => {
+    if (arffFile !== undefined) {
+      console.log(arffFile);
+      reader.readAsText(arffFile, "utf-8");
+      reader.onload = (event) => {
+        setTextofArffFile(event.target.result);
+      };
+    }
+  }, [arffFile]);
+
+  //
+  //Convert arff file to output file
+  useEffect(() => {
+    if (textOfArffFile !== undefined) {
+      console.log(textOfArffFile);
+
+      var textByLine = textOfArffFile.split("\n");
+      textByLine = textByLine.filter((line) => line !== "");
+      textByLine = textByLine.filter((line) => line.split("")[0] !== "@");
+      textByLine = textByLine.map((line) => line.split(","));
+
+      console.log(textByLine);
+
+      var pairsArray = [];
+      textByLine.forEach((row) => {
+        var nodeOnCluster = {
+          node: row[1],
+          cluster: row[2],
+        };
+
+        pairsArray.push(nodeOnCluster);
+      });
+
+      var finLinks = [];
+      pairsArray.forEach((pairOne, indexOne) => {
+        pairsArray.forEach((pairTwo, indexTwo) => {
+          if (indexOne < indexTwo && pairOne.cluster === pairTwo.cluster) {
+            finLinks.push({
+              x: pairOne.node,
+              y: pairTwo.node,
+            });
+          }
+        });
+      });
+
+      console.log(pairsArray);
+      console.log(finLinks);
+    }
+  }, [textOfArffFile]);
 
   //
   //upload gr input file
@@ -95,6 +160,12 @@ const App = () => {
     element.click();
 
     document.body.removeChild(element);
+  };
+
+  //
+  // upload arff input file
+  const handleArffFileUpload = (event) => {
+    setArffFile(event.target.files[0]);
   };
 
   //
@@ -197,10 +268,7 @@ const App = () => {
             Add your (.arff) file to the (.gr) file above and download output
             file
           </h5>{" "}
-          <input
-            type="file"
-            // onChange={handleArffFileUpload}
-          />
+          <input type="file" onChange={handleArffFileUpload} />
           <button
           // onClick={handleOutFileDownload}
           >
