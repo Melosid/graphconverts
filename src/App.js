@@ -15,6 +15,7 @@ const App = () => {
 
   const [arffFile, setArffFile] = useState();
   const [textOfArffFile, setTextofArffFile] = useState();
+  const [outputFile, setOutputFile] = useState();
 
   const reader = new FileReader();
 
@@ -39,7 +40,7 @@ const App = () => {
     if (textOfInputFile !== undefined) {
       var textByLine = textOfInputFile.split("\n");
       textByLine = textByLine.filter((line) => line !== "");
-      console.log(textByLine);
+      // console.log(textByLine);
 
       var dataObj = {
         nodesD: 0,
@@ -71,7 +72,7 @@ const App = () => {
       });
 
       dataObj.linkedNodes = dataObj.linkedNodes.sort((a, b) => a - b);
-      console.log(dataObj.linkedNodes);
+      // console.log(dataObj.linkedNodes);
       setDataObject(dataObj);
       console.log(initLinks);
       setInitialLinks(initLinks);
@@ -79,7 +80,7 @@ const App = () => {
       dataObj.linkedNodes.forEach((node) => {
         csv = csv + `\n ${node}`;
       });
-      console.log(csv);
+      // console.log(csv);
       setCsvFile(csv);
     }
   }, [textOfInputFile]);
@@ -100,14 +101,14 @@ const App = () => {
   //Convert arff file to output file
   useEffect(() => {
     if (textOfArffFile !== undefined) {
-      console.log(textOfArffFile);
+      // console.log(textOfArffFile);
 
       var textByLine = textOfArffFile.split("\n");
       textByLine = textByLine.filter((line) => line !== "");
       textByLine = textByLine.filter((line) => line.split("")[0] !== "@");
       textByLine = textByLine.map((line) => line.split(","));
 
-      console.log(textByLine);
+      // console.log(textByLine);
 
       var pairsArray = [];
       textByLine.forEach((row) => {
@@ -131,10 +132,48 @@ const App = () => {
         });
       });
 
-      console.log(pairsArray);
+      // console.log(pairsArray);
       console.log(finLinks);
+      setFinalLinks(finLinks);
     }
   }, [textOfArffFile]);
+
+  useEffect(() => {
+    if (initialLinks !== undefined && finalLinks !== undefined) {
+      var modifiedArray = [];
+
+      initialLinks.forEach((linkInit) => {
+        var similar = finalLinks.find(
+          (linkFin) => linkFin.x === linkInit.x && linkFin.y === linkInit.y
+        );
+        if (similar === undefined) {
+          modifiedArray.push(linkInit);
+        }
+      });
+
+      finalLinks.forEach((linkFin) => {
+        var similar = initialLinks.find(
+          (linkInit) => linkInit.x === linkFin.x && linkInit.y === linkFin.y
+        );
+        if (similar === undefined) {
+          modifiedArray.push(linkFin);
+        }
+      });
+
+      console.log(modifiedArray);
+
+      var out = "";
+      modifiedArray.forEach((modlink) => {
+        if (out.length === 0) {
+          out = out + `${modlink.x} ${modlink.y}`;
+        } else {
+          out = out + `\n${modlink.x} ${modlink.y}`;
+        }
+      });
+
+      setOutputFile(out);
+    }
+  }, [finalLinks]);
 
   //
   //upload gr input file
@@ -166,6 +205,27 @@ const App = () => {
   // upload arff input file
   const handleArffFileUpload = (event) => {
     setArffFile(event.target.files[0]);
+  };
+
+  //
+  //download out file
+  const handleOutFileDownload = () => {
+    //handle output file download
+    var element = document.createElement("a");
+    element.setAttribute(
+      "href",
+      "data:text/plain;charset=utf-8," + encodeURIComponent(outputFile)
+    );
+    var newName =
+      inputFile.name.substr(0, inputFile.name.length - 3) + "Converted.txt";
+    element.setAttribute("download", newName);
+
+    element.style.display = "none";
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
   };
 
   //
@@ -269,11 +329,7 @@ const App = () => {
             file
           </h5>{" "}
           <input type="file" onChange={handleArffFileUpload} />
-          <button
-          // onClick={handleOutFileDownload}
-          >
-            Download Output File
-          </button>
+          <button onClick={handleOutFileDownload}>Download Output File</button>
           {arffFile ? <h4>File chosen: {arffFile.name}</h4> : ""}
         </div>
       </div>
