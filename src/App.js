@@ -6,6 +6,8 @@ import {
   faFileUpload,
   faTimesCircle,
 } from "@fortawesome/free-solid-svg-icons";
+import Icon from "./fileConvert/fileIcon";
+import downloadFile from "./fileConvert/downloadfile";
 
 const App = () => {
   const [inputFile, setInputFile] = useState();
@@ -184,21 +186,7 @@ const App = () => {
   //
   //download csv file
   const handleDownload = () => {
-    var element = document.createElement("a");
-    element.setAttribute(
-      "href",
-      "data:text/plain;charset=utf-8," + encodeURIComponent(csvFile)
-    );
-    var newName =
-      inputFile.name.substr(0, inputFile.name.length - 3) + "Converted.csv";
-    element.setAttribute("download", newName);
-
-    element.style.display = "none";
-    document.body.appendChild(element);
-
-    element.click();
-
-    document.body.removeChild(element);
+    downloadFile(inputFile.name, csvFile, "Converted.csv");
   };
 
   //
@@ -210,22 +198,7 @@ const App = () => {
   //
   //download out file
   const handleOutFileDownload = () => {
-    //handle output file download
-    var element = document.createElement("a");
-    element.setAttribute(
-      "href",
-      "data:text/plain;charset=utf-8," + encodeURIComponent(outputFile)
-    );
-    var newName =
-      inputFile.name.substr(0, inputFile.name.length - 3) + "Converted.txt";
-    element.setAttribute("download", newName);
-
-    element.style.display = "none";
-    document.body.appendChild(element);
-
-    element.click();
-
-    document.body.removeChild(element);
+    downloadFile(inputFile.name, outputFile, "Output.txt");
   };
 
   //
@@ -263,65 +236,47 @@ const App = () => {
           }}
         >
           {inputFile === undefined ? (
-            <FontAwesomeIcon
-              id="uploadIcon"
-              icon={faFileUpload}
-              size="7x"
-              style={{ marginTop: "10px" }}
-              onClick={() => {
+            <Icon
+              ID="uploadIcon"
+              faIconType={faFileUpload}
+              Klik={() => {
                 document.getElementById("grUpload").click();
               }}
-              onMouseOver={() =>
-                (document.getElementById("uploadIcon").style.color = "grey")
-              }
-              onMouseOut={() =>
-                (document.getElementById("uploadIcon").style.color = "black")
-              }
+              margTop="10px"
+              size="7x"
             />
           ) : (
-            <FontAwesomeIcon
-              id="fileIcon"
-              icon={faFileAlt}
+            <Icon
+              ID="fileIcon"
+              faIconType={faFileAlt}
+              margTop="10px"
+              color="black"
               size="7x"
-              style={{ marginTop: "10px", color: "black" }}
             />
           )}
-          <FontAwesomeIcon
-            id="downloadIcon"
-            icon={faFileDownload}
+          <Icon
+            ID="downloadIcon"
+            faIconType={faFileDownload}
+            Klik={handleDownload}
+            // Klik={downloadFile(inputFile.name, csvFile, "Converted.csv")}
+            margTop="10px"
+            margLeft="50px"
             size="7x"
-            style={{ marginTop: "10px", marginLeft: "50px" }}
-            onClick={handleDownload}
-            onMouseOver={() =>
-              (document.getElementById("downloadIcon").style.color = "grey")
-            }
-            onMouseOut={() =>
-              (document.getElementById("downloadIcon").style.color = "black")
-            }
           />
-          <FontAwesomeIcon
-            id="clearIcon"
-            icon={faTimesCircle}
+          <Icon
+            ID="clearIcon"
+            faIconType={faTimesCircle}
+            margTop="10px"
+            margLeft="50px"
+            margBottom="70px"
             size="2x"
-            style={{
-              marginTop: "10px",
-              marginLeft: "50px",
-              marginBottom: "70px",
-              color: "black",
-            }}
-            onClick={() => {
+            Klik={() => {
               setInputFile(undefined);
               setTextOfInputFile(undefined);
               setCsvFile(undefined);
               setDataObject(undefined);
               document.getElementById("grUpload").value = null;
             }}
-            onMouseOver={() =>
-              (document.getElementById("clearIcon").style.color = "grey")
-            }
-            onMouseOut={() =>
-              (document.getElementById("clearIcon").style.color = "black")
-            }
           />
         </div>
         <div
@@ -353,64 +308,46 @@ const App = () => {
           }}
         >
           {arffFile === undefined ? (
-            <FontAwesomeIcon
-              id="uploadIcon2"
-              icon={faFileUpload}
-              size="7x"
-              style={{ marginTop: "10px" }}
-              onClick={() => {
+            <Icon
+              ID="uploadIcon2"
+              faIconType={faFileUpload}
+              Klik={() => {
                 document.getElementById("arffUpload").click();
               }}
-              onMouseOver={() =>
-                (document.getElementById("uploadIcon2").style.color = "grey")
-              }
-              onMouseOut={() =>
-                (document.getElementById("uploadIcon2").style.color = "black")
-              }
+              margTop="10px"
+              size="7x"
             />
           ) : (
-            <FontAwesomeIcon
-              id="fileIcon2"
-              icon={faFileAlt}
+            <Icon
+              ID="fileIcon2"
+              faIconType={faFileAlt}
+              margTop="10px"
+              color="black"
               size="7x"
-              style={{ marginTop: "10px", color: "black" }}
             />
           )}
-          <FontAwesomeIcon
-            id="downloadIcon2"
-            icon={faFileDownload}
+          <Icon
+            ID="downloadIcon2"
+            faIconType={faFileDownload}
+            Klik={handleOutFileDownload}
+            // Klik={downloadFile(inputFile.name, outputFile, "Output.txt")}
+            margTop="10px"
+            margLeft="50px"
             size="7x"
-            style={{ marginTop: "10px", marginLeft: "50px" }}
-            onClick={handleOutFileDownload}
-            onMouseOver={() =>
-              (document.getElementById("downloadIcon2").style.color = "grey")
-            }
-            onMouseOut={() =>
-              (document.getElementById("downloadIcon2").style.color = "black")
-            }
           />
-          <FontAwesomeIcon
-            id="clearIcon2"
-            icon={faTimesCircle}
+          <Icon
+            ID="clearIcon2"
+            faIconType={faTimesCircle}
+            margTop="10px"
+            margLeft="50px"
+            margBottom="70px"
             size="2x"
-            style={{
-              marginTop: "10px",
-              marginLeft: "50px",
-              marginBottom: "70px",
-              color: "black",
-            }}
-            onClick={() => {
+            Klik={() => {
               setArffFile(undefined);
               setTextofArffFile(undefined);
               setOutputFile(undefined);
               document.getElementById("arffUpload").value = null;
             }}
-            onMouseOver={() =>
-              (document.getElementById("clearIcon2").style.color = "grey")
-            }
-            onMouseOut={() =>
-              (document.getElementById("clearIcon2").style.color = "black")
-            }
           />
         </div>
       </div>
