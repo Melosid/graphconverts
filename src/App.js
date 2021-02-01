@@ -119,6 +119,7 @@ const App = () => {
           let from = arrayOfLine[0];
           let to = arrayOfLine[1];
           matrix[parseInt(from) - 1][parseInt(to) - 1] = 1;
+          matrix[parseInt(to) - 1][parseInt(from) - 1] = 1;
         }
       });
 
