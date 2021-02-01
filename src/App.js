@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFileAlt,
   faFileDownload,
@@ -40,49 +39,104 @@ const App = () => {
   //Convert input file .gr to csv file
   useEffect(() => {
     if (textOfInputFile !== undefined) {
+      // var textByLine = textOfInputFile.split("\n");
+      // textByLine = textByLine.filter((line) => line !== "");
+      // // console.log(textByLine);
+
+      // var dataObj = {
+      //   nodesD: 0,
+      //   linksD: 0,
+      //   linkedNodes: [],
+      // };
+      // var csv = "Nodes";
+      // var initLinks = [];
+
+      // textByLine.forEach((row) => {
+      // var arrayOfLine = row.split(" ");
+      // if (arrayOfLine[0] === "p") {
+      //   dataObj.nodes = arrayOfLine[2];
+      //   dataObj.links = arrayOfLine[3];
+      // } else {
+      //     if (!dataObj.linkedNodes.includes(arrayOfLine[0])) {
+      //       dataObj.linkedNodes.push(arrayOfLine[0]);
+      //     }
+      //     if (!dataObj.linkedNodes.includes(arrayOfLine[1])) {
+      //       dataObj.linkedNodes.push(arrayOfLine[1]);
+      //     }
+
+      //     //add to initialLinks
+      //     initLinks.push({
+      //       x: arrayOfLine[0],
+      //       y: arrayOfLine[1],
+      //     });
+      //   }
+      // });
+
+      // dataObj.linkedNodes = dataObj.linkedNodes.sort((a, b) => a - b);
+      // // console.log(dataObj.linkedNodes);
+      // setDataObject(dataObj);
+      // console.log(initLinks);
+      // setInitialLinks(initLinks);
+
+      // dataObj.linkedNodes.forEach((node) => {
+      //   csv = csv + `\n ${node}`;
+      // });
+      // console.log(csv);
+      // setCsvFile(csv);
+
       var textByLine = textOfInputFile.split("\n");
       textByLine = textByLine.filter((line) => line !== "");
-      // console.log(textByLine);
 
       var dataObj = {
         nodesD: 0,
         linksD: 0,
         linkedNodes: [],
       };
-      var csv = "Nodes";
-      var initLinks = [];
 
       textByLine.forEach((row) => {
         var arrayOfLine = row.split(" ");
         if (arrayOfLine[0] === "p") {
-          dataObj.nodes = arrayOfLine[2];
-          dataObj.links = arrayOfLine[3];
-        } else {
-          if (!dataObj.linkedNodes.includes(arrayOfLine[0])) {
-            dataObj.linkedNodes.push(arrayOfLine[0]);
-          }
-          if (!dataObj.linkedNodes.includes(arrayOfLine[1])) {
-            dataObj.linkedNodes.push(arrayOfLine[1]);
-          }
-
-          //add to initialLinks
-          initLinks.push({
-            x: arrayOfLine[0],
-            y: arrayOfLine[1],
-          });
+          dataObj.nodesD = arrayOfLine[2];
+          dataObj.linksD = arrayOfLine[3];
         }
       });
 
-      dataObj.linkedNodes = dataObj.linkedNodes.sort((a, b) => a - b);
-      // console.log(dataObj.linkedNodes);
-      setDataObject(dataObj);
-      console.log(initLinks);
-      setInitialLinks(initLinks);
+      console.log(dataObj.nodesD, dataObj.linksD);
+      var matrix = [];
 
-      dataObj.linkedNodes.forEach((node) => {
-        csv = csv + `\n ${node}`;
+      for (let i = 0; i < dataObj.nodesD; i++) {
+        matrix.push([]);
+      }
+      matrix.forEach((row) => {
+        for (let i = 0; i < dataObj.nodesD; i++) {
+          row.push(0);
+        }
       });
-      // console.log(csv);
+
+      textByLine.forEach((line) => {
+        var arrayOfLine = line.split(" ");
+        if (arrayOfLine[0] !== "p") {
+          let from = arrayOfLine[0];
+          let to = arrayOfLine[1];
+          matrix[parseInt(from) - 1][parseInt(to) - 1] = 1;
+        }
+      });
+
+      // console.log(matrix);
+
+      var csv = "Node";
+      for (let i = 0; i < dataObj.nodesD; i++) {
+        csv += `, ${i + 1}`;
+      }
+
+      matrix.forEach((row, i) => {
+        csv += `\n ${i + 1}`;
+        row.forEach((el) => {
+          csv += `, ${el}`;
+        });
+      });
+
+      console.log(csv);
       setCsvFile(csv);
     }
   }, [textOfInputFile]);
@@ -91,7 +145,7 @@ const App = () => {
   //Extract text from .arff file and save it when .arff file becomes available
   useEffect(() => {
     if (arffFile !== undefined) {
-      console.log(arffFile);
+      // console.log(arffFile);
       reader.readAsText(arffFile, "utf-8");
       reader.onload = (event) => {
         setTextofArffFile(event.target.result);
@@ -135,7 +189,7 @@ const App = () => {
       });
 
       // console.log(pairsArray);
-      console.log(finLinks);
+      // console.log(finLinks);
       setFinalLinks(finLinks);
     }
   }, [textOfArffFile]);
@@ -162,7 +216,7 @@ const App = () => {
         }
       });
 
-      console.log(modifiedArray);
+      // console.log(modifiedArray);
 
       var out = "";
       modifiedArray.forEach((modlink) => {
