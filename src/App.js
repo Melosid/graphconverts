@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import {
   faFileAlt,
   faFileDownload,
@@ -12,6 +12,7 @@ const App = () => {
   const [inputFile, setInputFile] = useState();
   const [textOfInputFile, setTextOfInputFile] = useState();
   const [dataObject, setDataObject] = useState();
+  const [dimensionNodes, setDimensionNodes] = useState();
   const [csvFile, setCsvFile] = useState();
 
   const [arffFile, setArffFile] = useState();
@@ -21,7 +22,10 @@ const App = () => {
   const reader = new FileReader();
 
   const [initialLinks, setInitialLinks] = useState();
+  // const [initialLinksArray, setInitialLinksArray] = useState();
   const [finalLinks, setFinalLinks] = useState();
+  // const [finalLinksArray, setFinalLinksArray] = useState();
+  const [modifiedLinks, setModifiedLinks] = useState();
 
   //
   //Extract text from .gr file and save it when .gr becomes available
@@ -39,51 +43,6 @@ const App = () => {
   //Convert input file .gr to csv file
   useEffect(() => {
     if (textOfInputFile !== undefined) {
-      // var textByLine = textOfInputFile.split("\n");
-      // textByLine = textByLine.filter((line) => line !== "");
-      // // console.log(textByLine);
-
-      // var dataObj = {
-      //   nodesD: 0,
-      //   linksD: 0,
-      //   linkedNodes: [],
-      // };
-      // var csv = "Nodes";
-      // var initLinks = [];
-
-      // textByLine.forEach((row) => {
-      // var arrayOfLine = row.split(" ");
-      // if (arrayOfLine[0] === "p") {
-      //   dataObj.nodes = arrayOfLine[2];
-      //   dataObj.links = arrayOfLine[3];
-      // } else {
-      //     if (!dataObj.linkedNodes.includes(arrayOfLine[0])) {
-      //       dataObj.linkedNodes.push(arrayOfLine[0]);
-      //     }
-      //     if (!dataObj.linkedNodes.includes(arrayOfLine[1])) {
-      //       dataObj.linkedNodes.push(arrayOfLine[1]);
-      //     }
-
-      //     //add to initialLinks
-      //     initLinks.push({
-      //       x: arrayOfLine[0],
-      //       y: arrayOfLine[1],
-      //     });
-      //   }
-      // });
-
-      // dataObj.linkedNodes = dataObj.linkedNodes.sort((a, b) => a - b);
-      // // console.log(dataObj.linkedNodes);
-      // setDataObject(dataObj);
-      // console.log(initLinks);
-      // setInitialLinks(initLinks);
-
-      // dataObj.linkedNodes.forEach((node) => {
-      //   csv = csv + `\n ${node}`;
-      // });
-      // console.log(csv);
-      // setCsvFile(csv);
-
       var textByLine = textOfInputFile.split("\n");
       textByLine = textByLine.filter((line) => line !== "");
 
@@ -101,6 +60,7 @@ const App = () => {
         }
       });
 
+      setDimensionNodes(dataObj.nodesD);
       console.log(dataObj.nodesD, dataObj.linksD);
       var matrix = [];
 
@@ -123,7 +83,23 @@ const App = () => {
         }
       });
 
-      // console.log(matrix);
+      textByLine.forEach((line) => {
+        var arrayOfLine = line.split(" ");
+        if (arrayOfLine[0] !== "p") {
+          let from = arrayOfLine[0];
+          let to = arrayOfLine[1];
+          // dataObj.linkedNodes.push({
+          //   x: from,
+          //   y: to,
+          // });
+          dataObj.linkedNodes.push(from);
+          dataObj.linkedNodes.push(to);
+        }
+      });
+
+      // console.log(dataObj.linkedNodes);
+      setInitialLinks(dataObj.linkedNodes);
+      // setInitialLinksArray(dataObj.linkedNodes);
 
       var csv = "Node";
       for (let i = 0; i < dataObj.nodesD; i++) {
@@ -137,7 +113,6 @@ const App = () => {
         });
       });
 
-      console.log(csv);
       setCsvFile(csv);
     }
   }, [textOfInputFile]);
@@ -146,7 +121,6 @@ const App = () => {
   //Extract text from .arff file and save it when .arff file becomes available
   useEffect(() => {
     if (arffFile !== undefined) {
-      // console.log(arffFile);
       reader.readAsText(arffFile, "utf-8");
       reader.onload = (event) => {
         setTextofArffFile(event.target.result);
@@ -158,39 +132,45 @@ const App = () => {
   //Convert arff file to output file
   useEffect(() => {
     if (textOfArffFile !== undefined) {
-      // console.log(textOfArffFile);
-
       var textByLine = textOfArffFile.split("\n");
       textByLine = textByLine.filter((line) => line !== "");
       textByLine = textByLine.filter((line) => line.split("")[0] !== "@");
       textByLine = textByLine.map((line) => line.split(","));
 
-      // console.log(textByLine);
+      let lastIndex = parseInt(dimensionNodes) + 2;
 
       var pairsArray = [];
       textByLine.forEach((row) => {
-        var nodeOnCluster = {
-          node: row[1],
-          cluster: row[2],
-        };
+        // var nodeOnCluster = {
+        //   node: row[1],
+        //   cluster: row[lastIndex],
+        // };
 
-        pairsArray.push(nodeOnCluster);
+        // pairsArray.push(nodeOnCluster);
+        pairsArray.push(row[1]);
+        pairsArray.push(row[lastIndex]);
       });
 
       var finLinks = [];
-      pairsArray.forEach((pairOne, indexOne) => {
-        pairsArray.forEach((pairTwo, indexTwo) => {
-          if (indexOne < indexTwo && pairOne.cluster === pairTwo.cluster) {
-            finLinks.push({
-              x: pairOne.node,
-              y: pairTwo.node,
-            });
+      // pairsArray.forEach((pairOne, indexOne) => {
+      //   pairsArray.forEach((pairTwo, indexTwo) => {
+      //     if (indexOne < indexTwo && pairOne.cluster === pairTwo.cluster) {
+      //       finLinks.push({
+      //         x: pairOne.node,
+      //         y: pairTwo.node,
+      //       });
+      //     }
+      //   });
+      // });
+      for (let i = 0; i < pairsArray.length; i += 2) {
+        for (let j = 0; j < pairsArray.length; j += 2) {
+          if (i < j && pairsArray[i + 1] === pairsArray[j + 1]) {
+            finLinks.push(pairsArray[i]);
+            finLinks.push(pairsArray[j]);
           }
-        });
-      });
-
-      // console.log(pairsArray);
-      // console.log(finLinks);
+        }
+      }
+      console.log(finLinks);
       setFinalLinks(finLinks);
     }
   }, [textOfArffFile]);
@@ -199,38 +179,146 @@ const App = () => {
     if (initialLinks !== undefined && finalLinks !== undefined) {
       var modifiedArray = [];
 
-      initialLinks.forEach((linkInit) => {
-        var similar = finalLinks.find(
-          (linkFin) => linkFin.x === linkInit.x && linkFin.y === linkInit.y
-        );
-        if (similar === undefined) {
-          modifiedArray.push(linkInit);
+      // initialLinks.forEach((linkInit) => {
+      //   var similar = finalLinks.find(
+      //     (linkFin) => linkFin.x === linkInit.x && linkFin.y === linkInit.y
+      //   );
+      //   if (similar === undefined) {
+      //     modifiedArray.push(linkInit);
+      //   }
+      // });
+
+      // finalLinks.forEach((linkFin) => {
+      //   var similar = initialLinks.find(
+      //     (linkInit) => linkInit.x === linkFin.x && linkInit.y === linkFin.y
+      //   );
+      //   if (similar === undefined) {
+      //     modifiedArray.push(linkFin);
+      //   }
+      // });
+      console.log("initial links ", initialLinks);
+      console.log("final links ", finalLinks);
+
+      console.log("initial links length", initialLinks.length);
+      console.log("final links length", finalLinks.length);
+
+      console.log("before first loop");
+      for (let l = 0; l < initialLinks.length; l += 2) {
+        var different = true;
+        for (let k = 0; k < finalLinks.length; k += 2) {
+          if (
+            initialLinks[l] === finalLinks[k] &&
+            initialLinks[l + 1] === finalLinks[k + 1]
+          ) {
+            different = false;
+          }
         }
-      });
-
-      finalLinks.forEach((linkFin) => {
-        var similar = initialLinks.find(
-          (linkInit) => linkInit.x === linkFin.x && linkInit.y === linkFin.y
-        );
-        if (similar === undefined) {
-          modifiedArray.push(linkFin);
+        if (different) {
+          console.log(initialLinks[l], initialLinks[l + 1]);
+          modifiedArray.push(initialLinks[l]);
+          modifiedArray.push(initialLinks[l + 1]);
         }
-      });
+      }
+      console.log("after first loop");
 
-      // console.log(modifiedArray);
-
-      var out = "";
-      modifiedArray.forEach((modlink) => {
-        if (out.length === 0) {
-          out = out + `${modlink.x} ${modlink.y}`;
-        } else {
-          out = out + `\n${modlink.x} ${modlink.y}`;
+      for (let p = 0; p < finalLinks.length; p += 2) {
+        var different2 = true;
+        for (let q = 0; q < initialLinks.length; q += 2) {
+          if (
+            finalLinks[p] === initialLinks[q] &&
+            finalLinks[p + 1] === initialLinks[q + 1]
+          ) {
+            different2 = false;
+          }
         }
-      });
+        if (different2) {
+          modifiedArray.push(finalLinks[p]);
+          modifiedArray.push(finalLinks[p + 1]);
+        }
+      }
+      console.log("after second loop");
 
-      setOutputFile(out);
+      // for (var l = 0; l < 20; l++) {
+      //   for (var k = 0; k < 21; k++) {
+      //     if (!false) {
+      //       console.log("something from first", l, k);
+      //     }
+      //   }
+      // }
+      // console.log("after first loop");
+
+      // for (var p = 0; p < 20; p = p + 2) {
+      //   for (var q = 0; q < 21; q = q + 2) {
+      //     if (!false) {
+      //       console.log("something from second", p, q);
+      //     }
+      //   }
+      // }
+      // console.log("after second loop");
+
+      console.log("finished");
+      setModifiedLinks(modifiedArray);
+
+      // modifiedArray.forEach((modlink) => {
+      //   if (out.length === 0) {
+      //     out += `${modlink.x} ${modlink.y}`;
+      //   } else {
+      //     out += `\n${modlink.x} ${modlink.y}`;
+      //   }
+      // });
     }
   }, [finalLinks]);
+
+  useEffect(() => {
+    if (modifiedLinks !== undefined) {
+      // var out = "";
+      // modifiedLinks.forEach((modlink) => {
+      //   if (out.length === 0) {
+      //     out = out + `${modlink.x} ${modlink.y}`;
+      //   } else {
+      //     out = out + `\n${modlink.x} ${modlink.y}`;
+      //   }
+      // });
+      // console.log(out);
+      // setOutputFile(out);
+
+      for (var h = 0; h < modifiedLinks.length; h += 2) {
+        for (var g = 0; g < modifiedLinks.length; g += 2) {
+          if (
+            modifiedLinks[h] === modifiedLinks[g] &&
+            modifiedLinks[h + 1] > modifiedLinks[g + 1]
+          ) {
+            // do nothing
+            console.log("sometthinggg");
+            var value3 = modifiedLinks[h + 1];
+            modifiedLinks[h + 1] = modifiedLinks[g + 1];
+            modifiedLinks[g + 1] = value3;
+          }
+          if (modifiedLinks[h] > modifiedLinks[g]) {
+            console.log("something else");
+            var value1 = modifiedLinks[h];
+            var value2 = modifiedLinks[h + 1];
+            modifiedLinks[h] = modifiedLinks[g];
+            modifiedLinks[h + 1] = modifiedLinks[g + 1];
+            modifiedLinks[g] = value1;
+            modifiedLinks[g + 1] = value2;
+          }
+        }
+      }
+
+      var out = "";
+      for (let r = 0; r < modifiedLinks.length; r += 2) {
+        if (out.length === 0) {
+          out += `${modifiedLinks[r]} ${modifiedLinks[r + 1]}`;
+        } else {
+          out += `\n${modifiedLinks[r]} ${modifiedLinks[r + 1]}`;
+        }
+      }
+
+      console.log(out);
+      setOutputFile(out);
+    }
+  }, [modifiedLinks]);
 
   //
   //upload gr input file
@@ -253,7 +341,7 @@ const App = () => {
   //
   //download out file
   const handleOutFileDownload = () => {
-    downloadFile(inputFile.name, outputFile, "Output.txt");
+    downloadFile(inputFile.name, outputFile, "Outputttt.txt");
   };
 
   //
