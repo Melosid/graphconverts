@@ -11,7 +11,6 @@ import downloadFile from "./fileConvert/downloadfile";
 const App = () => {
   const [inputFile, setInputFile] = useState();
   const [textOfInputFile, setTextOfInputFile] = useState();
-  const [dataObject, setDataObject] = useState();
   const [dimensionNodes, setDimensionNodes] = useState();
   const [csvFile, setCsvFile] = useState();
 
@@ -20,12 +19,6 @@ const App = () => {
   const [outputFile, setOutputFile] = useState();
 
   const reader = new FileReader();
-
-  const [initialLinks, setInitialLinks] = useState();
-  // const [initialLinksArray, setInitialLinksArray] = useState();
-  const [finalLinks, setFinalLinks] = useState();
-  // const [finalLinksArray, setFinalLinksArray] = useState();
-  const [modifiedLinks, setModifiedLinks] = useState();
 
   const [initMatrix, setInitMatrix] = useState();
   const [finalMatrix, setFinalMatrix] = useState();
@@ -94,18 +87,10 @@ const App = () => {
         if (arrayOfLine[0] !== "p") {
           let from = arrayOfLine[0];
           let to = arrayOfLine[1];
-          // dataObj.linkedNodes.push({
-          //   x: from,
-          //   y: to,
-          // });
           dataObj.linkedNodes.push(from);
           dataObj.linkedNodes.push(to);
         }
       });
-
-      // console.log(dataObj.linkedNodes);
-      setInitialLinks(dataObj.linkedNodes);
-      // setInitialLinksArray(dataObj.linkedNodes);
 
       var csv = "Node";
       for (let i = 0; i < dataObj.nodesD; i++) {
@@ -153,8 +138,6 @@ const App = () => {
         };
 
         pairsArray.push(nodeOnCluster);
-        // pairsArray.push(row[1]);
-        // pairsArray.push(row[lastIndex]);
       });
 
       var finLinks = [];
@@ -168,20 +151,7 @@ const App = () => {
           }
         });
       });
-      // for (let i = 0; i < pairsArray.length; i += 2) {
-      //   for (let j = 0; j < pairsArray.length; j += 2) {
-      //     if (i < j && pairsArray[i + 1] === pairsArray[j + 1]) {
-      //       finLinks.push(pairsArray[i]);
-      //       finLinks.push(pairsArray[j]);
-      //     }
-      //   }
-      // }
-      setFinalLinks(finLinks);
 
-      //
-      //
-      //
-      //
       var matrix = [];
 
       for (let i = 0; i < dimensionNodes; i++) {
@@ -229,142 +199,10 @@ const App = () => {
     console.log("difference matrix", matrix);
     setDifferenceMatrix(matrix);
   }, [finalMatrix]);
-  //
-  //
-
-  // useEffect(() => {
-  //   if (initialLinks !== undefined && finalLinks !== undefined) {
-  //     var modifiedArray = [];
-
-  //     // initialLinks.forEach((linkInit) => {
-  //     //   var similar = finalLinks.find(
-  //     //     (linkFin) => linkFin.x === linkInit.x && linkFin.y === linkInit.y
-  //     //   );
-  //     //   if (similar === undefined) {
-  //     //     modifiedArray.push(linkInit);
-  //     //   }
-  //     // });
-
-  //     // finalLinks.forEach((linkFin) => {
-  //     //   var similar = initialLinks.find(
-  //     //     (linkInit) => linkInit.x === linkFin.x && linkInit.y === linkFin.y
-  //     //   );
-  //     //   if (similar === undefined) {
-  //     //     modifiedArray.push(linkFin);
-  //     //   }
-  //     // });
-
-  //     for (let l = 0; l < initialLinks.length; l += 2) {
-  //       var different = true;
-  //       for (let k = 0; k < finalLinks.length; k += 2) {
-  //         if (
-  //           initialLinks[l] === finalLinks[k] &&
-  //           initialLinks[l + 1] === finalLinks[k + 1]
-  //         ) {
-  //           different = false;
-  //         }
-  //       }
-  //       if (different) {
-  //         modifiedArray.push(initialLinks[l]);
-  //         modifiedArray.push(initialLinks[l + 1]);
-  //       }
-  //     }
-
-  //     for (let p = 0; p < finalLinks.length; p += 2) {
-  //       var different2 = true;
-  //       for (let q = 0; q < initialLinks.length; q += 2) {
-  //         if (
-  //           finalLinks[p] === initialLinks[q] &&
-  //           finalLinks[p + 1] === initialLinks[q + 1]
-  //         ) {
-  //           different2 = false;
-  //         }
-  //       }
-  //       if (different2) {
-  //         modifiedArray.push(finalLinks[p]);
-  //         modifiedArray.push(finalLinks[p + 1]);
-  //       }
-  //     }
-  //     console.log("after second loop");
-
-  //     // for (var l = 0; l < 20; l++) {
-  //     //   for (var k = 0; k < 21; k++) {
-  //     //     if (!false) {
-  //     //       console.log("something from first", l, k);
-  //     //     }
-  //     //   }
-  //     // }
-  //     // console.log("after first loop");
-
-  //     // for (var p = 0; p < 20; p = p + 2) {
-  //     //   for (var q = 0; q < 21; q = q + 2) {
-  //     //     if (!false) {
-  //     //       console.log("something from second", p, q);
-  //     //     }
-  //     //   }
-  //     // }
-  //     // console.log("after second loop");
-
-  //     console.log("finished");
-  //     setModifiedLinks(modifiedArray);
-
-  //     // modifiedArray.forEach((modlink) => {
-  //     //   if (out.length === 0) {
-  //     //     out += `${modlink.x} ${modlink.y}`;
-  //     //   } else {
-  //     //     out += `\n${modlink.x} ${modlink.y}`;
-  //     //   }
-  //     // });
-  //   }
-  // }, [finalLinks]);
 
   useEffect(() => {
     if (differenceMatrix !== undefined) {
-      // var out = "";
-      // modifiedLinks.forEach((modlink) => {
-      //   if (out.length === 0) {
-      //     out = out + `${modlink.x} ${modlink.y}`;
-      //   } else {
-      //     out = out + `\n${modlink.x} ${modlink.y}`;
-      //   }
-      // });
-      // console.log(out);
-      // setOutputFile(out);
-
-      // var array = modifiedLinks;
-      // for (var h = 0; h < modifiedLinks.length; h += 2) {
-      //   for (var g = 0; g < modifiedLinks.length; g += 2) {
-      //     if (
-      //       modifiedLinks[h] === modifiedLinks[g] &&
-      //       modifiedLinks[h + 1] > modifiedLinks[g + 1]
-      //     ) {
-      //       // do nothing
-      //       console.log("sometthinggg");
-      //       var value3 = modifiedLinks[h + 1];
-      //       array[h + 1] = modifiedLinks[g + 1];
-      //       array[g + 1] = value3;
-      //     }
-      //     if (modifiedLinks[h] > modifiedLinks[g]) {
-      //       console.log("something else");
-      //       var value1 = modifiedLinks[h];
-      //       var value2 = modifiedLinks[h + 1];
-      //       array[h] = modifiedLinks[g];
-      //       array[h + 1] = modifiedLinks[g + 1];
-      //       array[g] = value1;
-      //       array[g + 1] = value2;
-      //     }
-      //   }
-      // }
-
       var out = "";
-      // for (let r = 0; r < modifiedLinks.length; r += 2) {
-      // if (out.length === 0) {
-      //   out += `${modifiedLinks[r]} ${modifiedLinks[r + 1]}`;
-      // } else {
-      //   out += `\n${modifiedLinks[r]} ${modifiedLinks[r + 1]}`;
-      // }
-      // }
-
       for (let c = 0; c < dimensionNodes; c++) {
         for (let v = 0; v < dimensionNodes; v++) {
           if (c < v && differenceMatrix[c][v] === 1) {
@@ -479,7 +317,6 @@ const App = () => {
               setInputFile(undefined);
               setTextOfInputFile(undefined);
               setCsvFile(undefined);
-              setDataObject(undefined);
               document.getElementById("grUpload").value = null;
             }}
           />
