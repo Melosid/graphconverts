@@ -24,6 +24,10 @@ const App = () => {
   const [finalMatrix, setFinalMatrix] = useState();
   const [differenceMatrix, setDifferenceMatrix] = useState();
 
+  const [linksRemoved, setLinksRemoved] = useState(0)
+  const [linksAdded, setLinksAdded] = useState(0)
+  const [linksModified, setLinksModified] = useState(0)
+
   //
   //Extract text from .gr file and save it when .gr becomes available
   useEffect(() => {
@@ -189,13 +193,26 @@ const App = () => {
       }
     });
 
+    let addCount = 0
+    let removeCount = 0
+
     for (let z = 0; z < dimensionNodes; z++) {
       for (let x = 0; x < dimensionNodes; x++) {
         if (initMatrix[z][x] !== finalMatrix[z][x]) {
           matrix[z][x] = 1;
+          if (initMatrix[z][x] === 0 && finalMatrix[z][x] === 1) {
+            addCount++
+          }
+          if (initMatrix[z][x] === 1 && finalMatrix[z][x] === 0) {
+            removeCount++
+          }
         }
       }
     }
+    console.log("added and removed " + addCount + "  " + removeCount);
+    setLinksAdded(addCount)
+    setLinksRemoved(removeCount)
+    setLinksModified(addCount + removeCount)
     console.log("difference matrix", matrix);
     setDifferenceMatrix(matrix);
   }, [finalMatrix]);
@@ -289,14 +306,14 @@ const App = () => {
               size="7x"
             />
           ) : (
-            <Icon
-              ID="fileIcon"
-              faIconType={faFileAlt}
-              margTop="10px"
-              color="black"
-              size="7x"
-            />
-          )}
+              <Icon
+                ID="fileIcon"
+                faIconType={faFileAlt}
+                margTop="10px"
+                color="black"
+                size="7x"
+              />
+            )}
           <Icon
             ID="downloadIcon"
             faIconType={faFileDownload}
@@ -317,6 +334,9 @@ const App = () => {
               setInputFile(undefined);
               setTextOfInputFile(undefined);
               setCsvFile(undefined);
+              setLinksAdded(0)
+              setLinksRemoved(0)
+              setLinksModified(0)
               document.getElementById("grUpload").value = null;
             }}
           />
@@ -360,14 +380,14 @@ const App = () => {
               size="7x"
             />
           ) : (
-            <Icon
-              ID="fileIcon2"
-              faIconType={faFileAlt}
-              margTop="10px"
-              color="black"
-              size="7x"
-            />
-          )}
+              <Icon
+                ID="fileIcon2"
+                faIconType={faFileAlt}
+                margTop="10px"
+                color="black"
+                size="7x"
+              />
+            )}
           <Icon
             ID="downloadIcon2"
             faIconType={faFileDownload}
@@ -388,13 +408,18 @@ const App = () => {
               setArffFile(undefined);
               setTextofArffFile(undefined);
               setOutputFile(undefined);
+              setLinksAdded(0)
+              setLinksRemoved(0)
+              setLinksModified(0)
               document.getElementById("arffUpload").value = null;
             }}
           />
         </div>
       </div>
-      <div style={{ width: "100%", height: "100vh" }}>
-        {/* <svg ref={svgEl} style={{ width: "100%", height: "100%" }}></svg> */}
+      <div style={{ display: 'flex', flexDirection: "column", width: "100%", height: "100vh" }}>
+        <text style={{ fontWeight: 'bold' }}>{`Links added: ${linksAdded}`}</text>
+        <text style={{ fontWeight: 'bold' }}>{`Links removed: ${linksRemoved}`}</text>
+        <text style={{ fontWeight: 'bold' }}>{`Total modified (removed or added): ${linksModified}`}</text>
       </div>
     </div>
   );
